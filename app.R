@@ -736,8 +736,8 @@ server <- function(input, output, session) {
     if (input$Type == "hist" || input$Type == "bar" || input$Type == "box") {
       p <- paste(p,
                  if (input$Type == "hist") {
-                   if(input$adj_bins) "geom_histogram(binwidth = input$bin_w"
-                   else "geom_histogram(nbins = 10"
+                   if(input$adj_bins) "geom_histogram(binwidth = input$bin_w, "
+                   else "geom_histogram(nbins = 10, "
                  },
                  if (input$Type == "bar")  "geom_bar(",
                  if (input$Type == "box")  "geom_boxplot(",
