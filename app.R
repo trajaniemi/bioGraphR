@@ -29,7 +29,12 @@ ui <- dashboardPage(
     useShinyjs(),
 
     tags$head(
-      tags$link(rel = "stylesheet", type = "text/css", href = "mystyle.css")
+      tags$link(rel = "stylesheet", 
+                type = "text/css", 
+                href = "mystyle.css"),
+      tags$link(rel = "icon",
+                type = "image/x-icon",
+                href = "scatter_plot.ico"
     ),
     
     tabItems(
@@ -55,8 +60,12 @@ ui <- dashboardPage(
                          conditionalPanel("input.data_input == '1'",
                                           h5("Choose a practice dataset: "),
                                           selectInput("data_choice", "",
-                                                      choices = list("Reduced mowing" = 1,
-                                                                     "Dune environment" = 2)
+                                                      choices = list("Hubbard Brook tree census" = 1,
+                                                                     "Dune environment" = 2,
+                                                                     "Framingham heart study" = 3,
+                                                                     "Reduced mowing" = 4,
+                                                                     "Sapling warming expt" = 5,
+                                                                     "Digoxin trial" = 6)
                                           )
                          ),
                          
@@ -219,6 +228,7 @@ ui <- dashboardPage(
                                       ),
                                       conditionalPanel("input.Type == 'scatter' || 
                                                        input.Type == 'bar_e' || 
+                                                       input.Type == 'hist' ||
                                                        input.Type == 'box'",
                                                        checkboxInput("num_y_values", 
                                                                      strong("Change axis value range"), 
@@ -528,10 +538,17 @@ server <- function(input, output, session) {
   df_original <- reactive({
     
     if (input$data_input == 1) {
-      if (input$data_choice == 1) 
-        data <- read_excel("data/mow data.xlsx")
-      else 
+      if (input$data_choice == 1)
+        data <- read_excel("data/Hubbard brook tree surveys.xlsx")
+      else if (input$data_choice == 2)
         data <- read_excel("data/dunes.xlsx")
+      else if (input$data_choice == 3)
+        data <- read_excel("data/Framingham subset.xlsx")
+      else if (input$data_choice == 4) 
+        data <- read_excel("data/mow data.xlsx")
+      else if (input$data_choice == 5)
+        data <- read_excel("data/CCASE saplings.xlsx")
+      else data <- read_excel("Digoxin.xlsx")
     } 
     
     else if (input$data_input == 2) {
@@ -916,6 +933,11 @@ server <- function(input, output, session) {
     )
   
   # End R-session when browser closed
-  session$onSessionEnded(stopApp)
+  if (!interactive()) {
+    session$onSessionEnded(function() {
+      stopApp()
+      q("no")
+    })
+  }
 }
 shinyApp(ui, server)
