@@ -1,12 +1,28 @@
+
 library(shiny)
 library(shinydashboard)
 library(shinyjs)
-library(shinyjqui)
-library(Hmisc)  
 library(tidyverse)
 library(readxl)
 library(cowplot)
 library(descriptr)
+library(shinyjqui)
+library(Hmisc)  
+
+theme_tr <- function (font_size = 12) {
+  theme_cowplot() %+replace% 
+    theme(axis.text = element_text(size = font_size),
+          axis.title = element_text(size = font_size),
+          legend.text = element_text(size = font_size),
+          legend.title = element_blank(),
+          legend.key.size = unit(2,"lines"),
+          strip.text = element_text(size = font_size),
+          strip.background = element_blank(), 
+          plot.background = element_blank(),
+          plot.title = element_text(size = font_size)) }
+
+theme_set(theme_tr())
+
 
 ui <- dashboardPage( 
   
@@ -34,9 +50,8 @@ ui <- dashboardPage(
                 href = "mystyle.css"),
       tags$link(rel = "icon",
                 type = "image/x-icon",
-                href = "scatter_plot.ico"
-    ),
-    
+                href = "scatter_plot.ico")
+    ),    
     tabItems(
 
       tabItem(tabName = "data_tab", 
@@ -846,16 +861,14 @@ server <- function(input, output, session) {
     
     # adjust theme
     p <- paste(p, 
+               " + theme_tr()",
                " + theme(axis.title = element_text(size = input$fnt_sz_ttl),", 
                "axis.text = element_text(size = input$fnt_sz_ax),", 
-               "legend.position = 'input$pos_leg',",
+               if (input$rot_txt)
+                 "axis.text.x = element_text(angle = 45, hjust = 1),",               "legend.position = 'input$pos_leg',",
                "legend.text = element_text(size = input$fnt_sz_leg_ttl),",
                "legend.title = element_text(size = input$fnt_sz_leg),",
-               "legend.key.size = unit(input$leg_key,'lines'),",
-               "plot.title = element_blank(),",
-               "plot.background = element_blank())",
-               if (input$rot_txt)
-                 "axis.text.x = element_text(angle = 45, hjust = 1),",
+               "legend.key.size = unit(input$leg_key,'lines'))",
                sep = "")
     
     # Replace name of variables by values
